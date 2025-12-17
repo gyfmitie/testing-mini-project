@@ -1,3 +1,5 @@
+from email.mime import text
+import unicodedata
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -23,17 +25,38 @@ class TextClassifier:
         logging.info("TextClassifier initialized.")
 
     def preprocess_text(self, text: str) -> str:
-        """
-        Cleans and normalizes a single text string.
+        """Cleans and normalizes a single text string.
+        - Removes HTML tags
+        - Removes URLs
+        - Normalizes accented characters to ASCII
         - Lowercases text
-        - Removes non-alphanumeric characters (keeping spaces)
+        - Removes non-alphabetic characters (keeping spaces)
+        - Collapses multiple spaces
         """
-    #   logging.debug(f"Preprocessing text: '{text}'")
+        import unicodedata
+
+        logging.debug(f"Preprocessing text: '{text}'")
+
+        # Step 1: Remove HTML tags (before lowercasing to handle <P> vs <p>)
+        text = re.sub(r"<[^>]+>", "", text)
+
+        # Step 2: Remove URLs (http, https, www)
+        text = re.sub(r"https?://\S+|www\.\S+", "", text)
+
+        # Step 3: Lowercase
         text = text.lower()
+
+        # Step 4: Normalize accented characters to ASCII (é → e, ñ → n)
+        text = unicodedata.normalize("NFKD", text)
+        text = text.encode("ascii", "ignore").decode("utf-8")
+
+        # Step 5: Remove non-alphabetical characters (keeping spaces)
         non_alphabetical_characters = r"[^a-z\s]"
         text = re.sub(non_alphabetical_characters, "", text)
+
+        # Step 6: Collapse multiple spaces and trim
         text = " ".join(text.split())
-    #   logging.debug(f"Preprocessed text: '{text}'")
+        logging.debug(f"Preprocessed text: '{text}'")
         return text
 
     def train(self, texts: list[str], labels: list[str]):
