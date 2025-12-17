@@ -28,12 +28,12 @@ class TextClassifier:
         - Lowercases text
         - Removes non-alphanumeric characters (keeping spaces)
         """
-        logging.debug(f"Preprocessing text: '{text}'")
+    #   logging.debug(f"Preprocessing text: '{text}'")
         text = text.lower()
         non_alphabetical_characters = r"[^a-z\s]"
         text = re.sub(non_alphabetical_characters, "", text)
         text = " ".join(text.split())
-        logging.debug(f"Preprocessed text: '{text}'")
+    #   logging.debug(f"Preprocessed text: '{text}'")
         return text
 
     def train(self, texts: list[str], labels: list[str]):
