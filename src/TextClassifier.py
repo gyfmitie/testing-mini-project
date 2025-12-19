@@ -60,20 +60,39 @@ class TextClassifier:
         return text
 
     def train(self, texts: list[str], labels: list[str]):
-        """
-        Trains the classification model.
-        """
+        """Trains the classification model with MLflow experiment tracking."""
         logging.info("Starting model training.")
-        # Preprocess all texts
-        processed_texts = [self.preprocess_text(text) for text in texts]
 
-        # Fit vectorizer and transform texts
+        # Preprocess and vectorize
+        processed_texts = [self.preprocess_text(text) for text in texts]
         X = self.vectorizer.fit_transform(processed_texts)
         y = labels
 
         # Train the model
         self.model.fit(X, y)
-        logging.info("Model training completed.")
+        # Calculate training accuracy
+        train_accuracy = self.model.score(X, y)
+
+        # ---- MLflow experiment tracking ----
+        try:
+            import mlflow
+            mlflow.set_tracking_uri("file:./mlruns")
+            mlflow.set_experiment("text-classifier")
+
+            with mlflow.start_run():
+                # Log hyperparameters (what we configured)
+                mlflow.log_param("max_iter", self.model.max_iter)
+                mlflow.log_param("model_type", type(self.model).__name__)
+                mlflow.log_param("vectorizer_type", type(self.vectorizer).__name__)
+            # Log metrics (what resulted)
+            mlflow.log_metric("train_samples", len(texts))
+            mlflow.log_metric("vocab_size", len(self.vectorizer.vocabulary_))
+            mlflow.log_metric("train_accuracy", train_accuracy)
+
+        except Exception as e:
+            logging.info(f"MLflow logging skipped: {e}")
+
+        logging.info(f"Model training completed. Training accuracy: {train_accuracy:.4f}")
 
     def predict(self, texts: list[str]) -> list[str]:
         """
