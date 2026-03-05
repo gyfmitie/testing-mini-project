@@ -130,6 +130,9 @@ cython_debug/
 # VS Code
 .vscode/
 
+# MLflow tracking output
+mlruns/
+
 # macOS
 .DS_Store
 

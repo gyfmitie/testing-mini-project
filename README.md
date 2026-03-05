@@ -6,6 +6,28 @@ This project demonstrates a basic Machine Learning pipeline for text classificat
 
 ## Getting Started
 
+### Option A: Dev Container (recommended)
+
+1. Open the project in VS Code.
+1. Run `Dev Containers: Reopen in Container`.
+1. Wait for container setup to finish.
+
+Dependencies are installed automatically from `requirements.txt` during container setup.
+
+Run the app:
+
+```sh
+python app.py
+```
+
+Run tests:
+
+```sh
+pytest -v
+```
+
+### Option B: Local Environment
+
 1. Open the project in your IDE and open the integrated terminal.
 
 1. Create a virtual environment and then activate it.
